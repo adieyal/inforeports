@@ -5,6 +5,7 @@ import sys
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 PROJECT_ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), ".."))
+PAGES_ROOT = os.path.join(PROJECT_ROOT, "..", "scrape", "pages")
 
 sys.path.append(os.path.join(PROJECT_ROOT, ".."))
 
@@ -121,6 +122,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
+    'cars',
 )
 
 # A sample logging configuration. The only tangible logging
