@@ -15,6 +15,10 @@ sleep_secs = 60 * 5
 
 index = dict()
 
+headers = {}
+headers['User-Agent'] = " Mozilla/5.0 (iPad; U; CPU OS 3_2_1 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Mobile/7B405"
+
+
 
 def clean_price(x):
     try:
@@ -98,7 +102,7 @@ def parse_page(id, html, pages_path):
         raise ParseException()
 
 def get_detail(url, pages_path):
-    r = requests.get(url) 
+    r = requests.get(url, headers=headers) 
     if r.status_code == 200:
         html = r.text
         return parse_page(url, html, pages_path)
