@@ -23,8 +23,6 @@ min_sleep = 60 * 2
 upper_sleep_threshold = 0.8
 lower_sleep_threshold = 0.5
 
-possible_misses = 0
-
 class ParseException(exceptions.Exception):
     pass
 
@@ -122,6 +120,8 @@ def get_entries(url=url, sleep_secs=sleep_secs, callback=lambda x: None, pages_p
     """
     function that runs in a loop and scrapes the latest advertisements from gumtree
     """
+    possible_misses = 0
+
 
     def update_sleep_time(total_entries, processed_entries, current_sleep_secs):
         # if we have too many new entries then increase the polling time
