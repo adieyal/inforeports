@@ -27,7 +27,10 @@ def clean_price(x):
         return 0
 
 def clean_mileage(x):
-    return int(x)
+    try:
+        return int(x)
+    except ValueError:
+        return 0
 
 def clean_date(x):
     return parser.parse(x)
