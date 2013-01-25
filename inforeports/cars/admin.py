@@ -4,5 +4,6 @@ import models
 class CarAdAdmin(admin.ModelAdmin):
     list_display = ("province", "make", "model", "year", "mileage", "price")
     list_filter = ("make", "model", "year", "province")
+    date_hierarchy = "date_listed"
 
 admin.site.register(models.CarAd, CarAdAdmin)
