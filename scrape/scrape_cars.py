@@ -11,14 +11,25 @@ import exceptions
 from dateutil import parser
 
 url = "http://www.gumtree.co.za/f-SearchAdRss?CatId=9077&Location=201"
-sleep_secs = 60 * 5
 
 index = dict()
 
 headers = {}
 headers['User-Agent'] = " Mozilla/5.0 (iPad; U; CPU OS 3_2_1 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Mobile/7B405"
 
+sleep_secs = 60 * 5
+max_sleep = 60 * 30
+min_sleep = 60 * 2
+upper_sleep_threshold = 0.8
+lower_sleep_threshold = 0.5
 
+possible_misses = 0
+
+class ParseException(exceptions.Exception):
+    pass
+
+class DuplicateException(exceptions.Exception):
+    pass
 
 def clean_price(x):
     try:
@@ -35,12 +46,6 @@ def clean_mileage(x):
 def clean_date(x):
     return parser.parse(x)
 
-class ParseException(exceptions.Exception):
-    def __init__(self, value):
-        self.value = value
-
-    def __repr__(self):
-        return repr(self.value)
 
 def parse_page(id, html, pages_path):
     def extract_field(rows, title):
@@ -68,7 +73,7 @@ def parse_page(id, html, pages_path):
     h = md5.md5(str(id)).hexdigest()
     filename = "%s/%s.txt" % (pages_path, h)
     if os.path.exists(filename):
-        return None
+        raise DuplicateException("%s already exists" % id)
 
     f = open(filename, "w")
     f.write(encoded)
@@ -114,8 +119,28 @@ def get_detail(url, pages_path):
         
 
 def get_entries(url=url, sleep_secs=sleep_secs, callback=lambda x: None, pages_path="/tmp"):
+    """
+    function that runs in a loop and scrapes the latest advertisements from gumtree
+    """
+
+    def update_sleep_time(total_entries, processed_entries, current_sleep_secs):
+        # if we have too many new entries then increase the polling time
+        if processed_entries >= total_entries * upper_sleep_threshold:
+            current_sleep_secs = current_sleep_secs - 60
+            if current_sleep_secs < min_sleep:
+                current_sleep_secs = min_sleep
+        # if we have too few new entries then descrease the polling time
+        elif processed_entries <= total_entries * lower_sleep_threshold:
+            current_sleep_secs = current_sleep_secs + 60
+            if current_sleep_secs > max_sleep:
+                current_sleep_secs = max_sleep
+
+        return current_sleep_secs
+        
     while True:
         d = feedparser.parse(url)
+        total_entries = len(d["entries"])
+        processed_entries = 0
         for el in d["entries"]:
             link = el["link"]
             if not link in index:
@@ -126,14 +151,25 @@ def get_entries(url=url, sleep_secs=sleep_secs, callback=lambda x: None, pages_p
                 }
                 try:
                     vals = get_detail(link, pages_path)
+                    processed_entries += 1
                     callback(vals)
+                except DuplicateException, e:
+                    puts(colored.red(e.message))
                 except Exception, e: 
                     import traceback; traceback.print_exc()
                     puts(colored.red("%s: %s" % (e.message, link)))
 
+        if len(d["entries"]) == processed_entries:
+            possible_misses += 1
+            puts(colored.green("Possible misses: %s" % possible_misses))
+        sleep_secs = update_sleep_time(total_entries, processed_entries, sleep_secs)
+        puts(colored.blue("Current sleep time: %s" % (sleep_secs)))
         time.sleep(sleep_secs)
 
 def get_entries_disk(callback=lambda x: None):
+    """
+    function used for testing by reading files from disk.
+    """
     for filename in glob.glob("pages/*.txt"):
         fp = open(filename)
         vals = parse_page(filename, fp.read().decode("utf8"))
