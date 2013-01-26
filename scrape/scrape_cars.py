@@ -18,7 +18,7 @@ headers = {}
 headers['User-Agent'] = " Mozilla/5.0 (iPad; U; CPU OS 3_2_1 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Mobile/7B405"
 
 sleep_secs = 60 * 2
-max_sleep = 60 * 30
+max_sleep = 60 * 10
 min_sleep = 60 * 1
 upper_sleep_threshold = 0.8
 lower_sleep_threshold = 0.5
