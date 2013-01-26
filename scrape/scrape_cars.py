@@ -10,7 +10,7 @@ from BeautifulSoup import BeautifulSoup, Tag
 import exceptions
 from dateutil import parser
 
-url = "http://www.gumtree.co.za/f-SearchAdRss?CatId=9077&Location=201"
+url = "http://www.gumtree.co.za/f-SearchAdRss?AdType=2&CatId=9077&Location=201"
 
 index = dict()
 
@@ -126,12 +126,12 @@ def get_entries(url=url, sleep_secs=sleep_secs, callback=lambda x: None, pages_p
     def update_sleep_time(total_entries, processed_entries, current_sleep_secs):
         # if we have too many new entries then increase the polling time
         if processed_entries >= total_entries * upper_sleep_threshold:
-            current_sleep_secs = current_sleep_secs - 60
+            current_sleep_secs = current_sleep_secs = min_sleep
             if current_sleep_secs < min_sleep:
                 current_sleep_secs = min_sleep
         # if we have too few new entries then descrease the polling time
         elif processed_entries <= total_entries * lower_sleep_threshold:
-            current_sleep_secs = current_sleep_secs + 60
+            current_sleep_secs = current_sleep_secs * 2
             if current_sleep_secs > max_sleep:
                 current_sleep_secs = max_sleep
 
