@@ -44,4 +44,9 @@ class CarAdAdmin(admin.ModelAdmin):
     date_hierarchy = "date_listed"
     actions = [export_as_csv_action("Export model as CSV file", header=True)]
 
+class CarModelAdmin(admin.ModelAdmin):
+    list_display = ("make", "model")
+    list_filter = ("make", "model")
+
 admin.site.register(models.CarAd, CarAdAdmin)
+admin.site.register(models.CarModel, CarModelAdmin)
