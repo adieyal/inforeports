@@ -14,10 +14,10 @@ class CarAd(models.Model):
     transmission = models.CharField(max_length=20, blank=True)
     drive_train = models.CharField(max_length=40, blank=True)
     air_conditioning = models.CharField(max_length=20, blank=True)
-    description = models.TextField()
-    province = models.CharField(max_length=40)
-    area = models.CharField(max_length=20)
-    suburb = models.CharField(max_length=20)
+    description = models.TextField(blank=True)
+    province = models.CharField(max_length=40, blank=True)
+    area = models.CharField(max_length=40, blank=True)
+    suburb = models.CharField(max_length=40, blank=True)
     hash = models.CharField(max_length=255)
 
     def __unicode__(self):
