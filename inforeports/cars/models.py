@@ -5,7 +5,7 @@ class CarAd(models.Model):
     date_listed = models.DateField()
     price = models.FloatField()
     address = models.TextField(blank=True)
-    seller_type = models.CharField(max_length=20)
+    seller_type = models.CharField(max_length=20, blank=True)
     make = models.CharField(max_length=20)
     model = models.CharField(max_length=20)
     body_type = models.CharField(max_length=20, blank=True)
@@ -22,6 +22,10 @@ class CarAd(models.Model):
 
     def __unicode__(self):
         return u'%s' % (self.title)
+
+class CarAttributes(models.Model):
+    ad = models.OneToOneField(CarAd)
+    has_bluetooth = models.BooleanField()
 
 class CarModel(models.Model):
     make = models.CharField(max_length=20)

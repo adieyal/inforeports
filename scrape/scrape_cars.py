@@ -17,9 +17,9 @@ index = dict()
 headers = {}
 headers['User-Agent'] = " Mozilla/5.0 (iPad; U; CPU OS 3_2_1 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Mobile/7B405"
 
-sleep_secs = 60 * 2
 max_sleep = 60 * 10
-min_sleep = 60 * 1
+min_sleep = 60 * 0.5
+sleep_secs = min_sleep
 upper_sleep_threshold = 0.8
 lower_sleep_threshold = 0.5
 
@@ -64,7 +64,9 @@ def parse_page(id, html, pages_path):
             else:
                 text.append(head)
 
-        return " ".join(text).strip()
+        s = " ".join(text).strip()
+        s = s.replace("&nbsp;", " ").replace("&amp;", "&")
+        return " ".join(s.split())
 
         
     encoded = html.encode("utf8")
@@ -108,7 +110,7 @@ def parse_page(id, html, pages_path):
         raise ParseException()
 
 def get_detail(url, pages_path):
-    r = requests.get(url, headers=headers) 
+    r = requests.get(url, headers=headers, timeout=30) 
     if r.status_code == 200:
         html = r.text
         return parse_page(url, html, pages_path)
@@ -131,7 +133,7 @@ def get_entries(url=url, sleep_secs=sleep_secs, callback=lambda x: None, pages_p
                 current_sleep_secs = min_sleep
         # if we have too few new entries then descrease the polling time
         elif processed_entries <= total_entries * lower_sleep_threshold:
-            current_sleep_secs = current_sleep_secs * 2
+            current_sleep_secs = current_sleep_secs + 60
             if current_sleep_secs > max_sleep:
                 current_sleep_secs = max_sleep
 
